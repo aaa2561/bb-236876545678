@@ -1,0 +1,1133 @@
+<!DOCTYPE html>
+<!--
+  ⛰️⛰️⛰️  屎 山 代 码 警 告  ⛰️⛰️⛰️
+  本项目历经 7 位实习生、3 次重构失败、1 次"我就改一行"事件。
+  任何试图重构的人请注意：它能跑，你别动。
+  作者：一个饿到凌晨 2:47 还在写 CSS 的人
+  最后修改：2026-09-11（这次真的只改了一行注释）
+-->
+<html lang="zh-CN" data-page-node-id="nIDLmsdIwJnPa5bUGcLoD5">
+<head data-page-node-id="LnKjcMKH7GccOyCzv7wfhc">
+<meta charset="UTF-8" data-page-node-id="sd0ZB1QZgk9WSIo6pumcGd">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" data-page-node-id="jCFTth7vZ8cbVxg9gWrfl9">
+<title>今天吃啥 · 命运转盘（专治选择困难症）</title>
+<style>
+/* ==========================================================
+   第 1 层屎山：CSS
+   下面所有 !important 都是历史原因，删了转盘会歪（其实不会）
+   ========================================================== */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+* { box-sizing: border-box !important; }   /* 重复一遍，保险 */
+html, body { height: 100%; }
+body {
+  font-family: "PingFang SC", "Microsoft YaHei", "Segoe UI", system-ui, -apple-system, sans-serif;
+  color: #43291a;
+  background:
+    radial-gradient(1100px 620px at 12% -8%, #fff2dc 0%, rgba(255,242,220,0) 62%),
+    radial-gradient(900px 560px at 108% 4%, #ffe0e8 0%, rgba(255,224,232,0) 58%),
+    radial-gradient(760px 620px at 50% 118%, #ffeec9 0%, rgba(255,238,201,0) 60%),
+    linear-gradient(180deg, #fffaf3 0%, #fdf3e7 55%, #fff7ec 100%);
+  min-height: 100%;
+  overflow-x: hidden;
+}
+/* 装饰用，其实看不太出来，但删掉总感觉少了点什么 */
+body::before {
+  content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background-image: radial-gradient(rgba(180,120,60,.10) 1px, transparent 1px);
+  background-size: 22px 22px; opacity: .5;
+}
+.a, .b, .c { display: none; }  /* 2020 年的类，没人记得干什么的 */
+
+.app {
+  position: relative; z-index: 1;
+  max-width: 1320px; margin: 0 auto; padding: 26px 22px 40px;
+}
+header.hero { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
+h1.title {
+  font-size: 34px; line-height: 1.1; letter-spacing: 1px;
+  background: linear-gradient(94deg, #ff5f3d, #ff9a3d 42%, #ffbe2e 70%, #ff6fa5);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  font-weight: 900;
+}
+h1.title .em { font-size: 30px; -webkit-text-fill-color: initial; }
+.subtitle { margin-top: 8px; font-size: 13.5px; color: #9a7358; letter-spacing: .3px; }
+.subtitle b { color: #ff6a3d; }
+.hero-right { display: flex; gap: 8px; align-items: center; }
+
+.main { display: grid; grid-template-columns: 306px minmax(0,1fr) 320px; gap: 20px; align-items: start; }
+
+.card {
+  background: rgba(255,255,255,.82);
+  border: 1px solid rgba(255,255,255,.9);
+  border-radius: 22px;
+  box-shadow: 0 18px 40px -22px rgba(140,80,30,.36), 0 2px 6px rgba(160,100,50,.06);
+  backdrop-filter: blur(9px) saturate(1.15);
+  -webkit-backdrop-filter: blur(9px) saturate(1.15);
+  padding: 18px 18px 20px;
+}
+.card + .card { margin-top: 16px; }
+.card h2 { font-size: 14.5px; font-weight: 800; letter-spacing: .5px; display: flex; align-items: center; gap: 8px; color: #5d3a24; }
+.card h2 .dot { width: 8px; height: 8px; border-radius: 50%; background: linear-gradient(140deg,#ff8a4c,#ff4d6d); box-shadow: 0 0 0 4px rgba(255,120,90,.16); }
+.card h2 .idx { font-size: 11px; font-weight: 800; color: #fff; background: linear-gradient(140deg,#ffa14c,#ff6a3d); border-radius: 7px; padding: 2px 7px; letter-spacing: .5px; }
+.hint { font-size: 12px; color: #a9836a; margin-top: 7px; line-height: 1.6; }
+
+/* ---------- 口味 chips ---------- */
+.chips { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+.chip {
+  border: 1.5px solid rgba(220,170,130,.6);
+  background: #fff;
+  border-radius: 14px; padding: 9px 14px 9px 11px;
+  font-size: 15px; font-weight: 800; color: #7a5136; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 7px;
+  transition: transform .16s cubic-bezier(.34,1.56,.64,1), box-shadow .2s, background .2s, color .2s, border-color .2s;
+  user-select: none;
+}
+.chip .k { font-size: 17px; }
+.chip:hover { transform: translateY(-2px); box-shadow: 0 8px 18px -10px rgba(255,110,60,.7); }
+.chip[data-on="1"] { color: #fff; border-color: transparent; box-shadow: 0 10px 22px -12px rgba(255,90,60,.9); }
+.chip[data-on="1"][data-k="酸"] { background: linear-gradient(140deg,#7ed957,#2fb36a); }
+.chip[data-on="1"][data-k="甜"] { background: linear-gradient(140deg,#ffb03a,#ff7a9c); }
+.chip[data-on="1"][data-k="辣"] { background: linear-gradient(140deg,#ff6a3d,#e8262d); }
+.chip[data-on="1"][data-k="咸"] { background: linear-gradient(140deg,#59b8ff,#3b6fe0); }
+.row-mini { display: flex; gap: 8px; margin-top: 12px; }
+.btn-ghost {
+  flex: 1; border: 1.5px dashed rgba(200,150,110,.75); background: rgba(255,250,244,.7);
+  border-radius: 12px; padding: 8px 10px; font-size: 12.5px; font-weight: 700; color: #8a6046; cursor: pointer;
+  transition: .18s;
+}
+.btn-ghost:hover { background: #fff3e6; color: #ff6a3d; border-color: #ffb27d; }
+
+/* ---------- 输入 ---------- */
+.input-row { display: flex; gap: 8px; margin-top: 13px; }
+.input-row input {
+  flex: 1; min-width: 0; border: 1.5px solid rgba(215,170,135,.6); background: #fff;
+  border-radius: 12px; padding: 10px 12px; font-size: 13.5px; color: #4b2f1d; outline: none;
+  font-family: inherit;
+}
+.input-row input:focus { border-color: #ffab6b; box-shadow: 0 0 0 4px rgba(255,150,90,.16); }
+.btn-add {
+  border: 0; border-radius: 12px; padding: 0 15px; font-weight: 800; font-size: 13.5px; color: #fff; cursor: pointer;
+  background: linear-gradient(140deg,#ffa14c,#ff6a3d); box-shadow: 0 10px 20px -12px #ff7a3d;
+}
+.btn-add:active { transform: translateY(1px); }
+#customList { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 11px; }
+.cus {
+  display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 700; color: #8a5a3a;
+  background: #fff3e2; border: 1px solid #ffdcbb; border-radius: 999px; padding: 5px 8px 5px 11px;
+}
+.cus b { cursor: pointer; color: #d18b5e; font-size: 14px; line-height: 1; }
+.cus b:hover { color: #e8262d; }
+
+/* ---------- 开关 ---------- */
+.switch { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 12px; font-size: 13px; color: #6f4a32; font-weight: 600; }
+.switch:first-of-type { margin-top: 14px; }
+.sw { position: relative; width: 46px; height: 26px; flex: none; cursor: pointer; }
+.sw input { position: absolute; opacity: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
+.sw i {
+  position: absolute; inset: 0; border-radius: 999px; background: #e6d5c4; transition: .24s;
+}
+.sw i::after {
+  content: ""; position: absolute; width: 20px; height: 20px; border-radius: 50%; background: #fff;
+  top: 3px; left: 3px; transition: .24s cubic-bezier(.34,1.56,.64,1); box-shadow: 0 2px 5px rgba(120,70,30,.3);
+}
+.sw input:checked + i { background: linear-gradient(140deg,#7ed957,#28b56a); }
+.sw input:checked + i::after { transform: translateX(20px); }
+
+/* ---------- 转盘舞台 ---------- */
+.stage-card { padding: 16px 16px 22px; }
+.stage {
+  position: relative; width: 100%; max-width: 566px; margin: 6px auto 0; aspect-ratio: 1 / 1;
+}
+#wheel { width: 100%; height: 100%; display: block; border-radius: 50%; }
+.pointer {
+  position: absolute; left: 50%; top: -6px; transform: translateX(-50%);
+  width: 40px; height: 56px; z-index: 4; filter: drop-shadow(0 8px 12px rgba(180,70,20,.42));
+}
+.pointer svg { width: 100%; height: 100%; display: block; }
+.hub {
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%);
+  width: 27%; aspect-ratio: 1/1; border-radius: 50%; border: 0; cursor: pointer;
+  background: radial-gradient(circle at 34% 28%, #ffd08a, #ff8a3d 46%, #f0392f 100%);
+  color: #fff; font-weight: 900; font-family: inherit;
+  box-shadow: 0 0 0 7px rgba(255,255,255,.95), 0 0 0 9px rgba(255,190,120,.55), 0 16px 30px -12px rgba(220,80,30,.75);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px;
+  transition: transform .16s cubic-bezier(.34,1.56,.64,1), box-shadow .2s;
+  z-index: 5; letter-spacing: .5px;
+}
+.hub .big { font-size: clamp(16px, 3.6vw, 23px); }
+.hub .small { font-size: 10px; opacity: .9; font-weight: 700; letter-spacing: 2px; }
+.hub:hover { transform: translate(-50%,-50%) scale(1.05); }
+.hub:active { transform: translate(-50%,-50%) scale(.96); }
+.hub[disabled] { cursor: not-allowed; filter: saturate(.6) brightness(1.06); }
+.hub.pulse { animation: hubPulse 1.1s ease-in-out infinite; }
+@keyframes hubPulse {
+  0%,100% { box-shadow: 0 0 0 7px rgba(255,255,255,.95), 0 0 0 9px rgba(255,190,120,.5), 0 16px 30px -12px rgba(220,80,30,.7); }
+  50%     { box-shadow: 0 0 0 7px rgba(255,255,255,.95), 0 0 0 16px rgba(255,170,90,.22), 0 16px 34px -10px rgba(220,80,30,.8); }
+}
+.stage-foot { text-align: center; margin-top: 14px; font-size: 12.5px; color: #a3816a; }
+.stage-foot .pill {
+  display: inline-flex; gap: 10px; align-items: center; background: rgba(255,247,238,.9); border: 1px solid #ffe2c8;
+  border-radius: 999px; padding: 7px 15px; font-weight: 700; color: #8a5a3a;
+}
+.stage-foot .pill b { color: #ff6a3d; }
+
+/* ---------- 结果卡 ---------- */
+.result { margin-top: 15px; border-radius: 18px; padding: 18px 16px; text-align: center;
+  background: linear-gradient(165deg, #fffaf2, #fff1e0 60%, #ffe9d6); border: 1.5px dashed #ffd0a3;
+  transition: .3s; min-height: 186px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 9px;
+}
+.result.empty { border-style: dashed; color: #b39079; }
+.result.empty .ph-emoji { font-size: 44px; filter: grayscale(.3); opacity: .55; }
+.result.win { border-style: solid; border-color: #ffc78c; background: linear-gradient(165deg,#fffdf8,#fff2df 55%,#ffe6cd); box-shadow: inset 0 0 0 1px rgba(255,255,255,.9), 0 14px 30px -20px rgba(230,110,40,.6); }
+.result.win .emo { font-size: 62px; line-height: 1; animation: pop .55s cubic-bezier(.34,1.56,.64,1); }
+.result.win .name { font-size: 25px; font-weight: 900; color: #e2571f; letter-spacing: .5px; }
+@keyframes pop { 0% { transform: scale(.2) rotate(-16deg); opacity: 0 } 60% { transform: scale(1.16) rotate(5deg) } 100% { transform: scale(1) rotate(0); opacity: 1 } }
+.tags { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
+.tag { font-size: 11.5px; font-weight: 800; padding: 3px 9px; border-radius: 999px; background: #fff; border: 1px solid #ffd7b3; color: #a4673d; }
+.tag.f-酸 { background: #eafbe4; border-color: #b7e8a2; color: #37792f; }
+.tag.f-甜 { background: #fff2f6; border-color: #ffc3d6; color: #c9377a; }
+.tag.f-辣 { background: #ffefec; border-color: #ffbdb0; color: #cf3320; }
+.tag.f-咸 { background: #eaf3ff; border-color: #b6d5ff; color: #2b5bb5; }
+.tag.f-自定义 { background: #f4f0ff; border-color: #d3c7ff; color: #5b46c4; }
+.verdict { font-size: 12.5px; color: #a4754f; font-weight: 700; }
+.acts { display: flex; gap: 9px; margin-top: 4px; }
+.btn-main, .btn-sub {
+  border: 0; border-radius: 13px; padding: 11px 17px; font-weight: 800; font-size: 13.5px; cursor: pointer; font-family: inherit;
+  transition: transform .16s cubic-bezier(.34,1.56,.64,1), box-shadow .2s;
+}
+.btn-main { color: #fff; background: linear-gradient(140deg,#ff9a3d,#ff4d5e); box-shadow: 0 12px 24px -14px #ff5a3d; }
+.btn-sub { color: #8a5533; background: #fff; border: 1.5px solid #ffd6b0; }
+.btn-main:hover, .btn-sub:hover { transform: translateY(-2px); }
+.btn-main:active, .btn-sub:active { transform: translateY(0); }
+
+/* ---------- 历史 ---------- */
+#history { margin-top: 12px; display: flex; flex-direction: column; gap: 8px; max-height: 268px; overflow: auto; padding-right: 3px; }
+#history::-webkit-scrollbar { width: 6px; }
+#history::-webkit-scrollbar-thumb { background: #ffd9bb; border-radius: 99px; }
+.hist { display: flex; align-items: center; gap: 9px; background: #fffaf4; border: 1px solid #ffe8d3; border-radius: 12px; padding: 8px 11px; font-size: 13px; }
+.hist .he { font-size: 19px; }
+.hist .hn { flex: 1; font-weight: 700; color: #6b4429; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hist .ht { font-size: 11px; color: #b08d75; font-variant-numeric: tabular-nums; }
+.hist.today { border-color: #ffcfa4; background: linear-gradient(120deg,#fff9f0,#fff2e2); }
+.none-tip { font-size: 12.5px; color: #b39079; text-align: center; padding: 14px 6px; line-height: 1.7; }
+.btn-clear { margin-top: 12px; width: 100%; border: 0; background: transparent; color: #c08f6d; font-size: 12px; cursor: pointer; font-family: inherit; text-decoration: underline dotted; }
+.btn-clear:hover { color: #e8262d; }
+
+/* ---------- 撒花 ---------- */
+#confetti { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 99999; }
+
+/* ---------- toast ---------- */
+#toast {
+  position: fixed; left: 50%; bottom: 34px; transform: translate(-50%, 18px); opacity: 0;
+  background: rgba(58,34,20,.93); color: #fff; font-size: 13.5px; font-weight: 700; padding: 11px 20px; border-radius: 999px;
+  z-index: 100000; transition: .28s cubic-bezier(.34,1.56,.64,1); pointer-events: none; white-space: nowrap; max-width: 88vw; overflow: hidden; text-overflow: ellipsis;
+}
+#toast.on { opacity: 1; transform: translate(-50%, 0); }
+
+@media (max-width: 1180px) {
+  .main { grid-template-columns: 280px minmax(0,1fr); }
+  .col3 { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start; }
+  .col3 .card + .card { margin-top: 0; }
+}
+@media (max-width: 860px) {
+  .main { grid-template-columns: 1fr; }
+  .stage { order: -1; }
+  .col1, .col2, .col3 { display: contents; }
+  header.hero { margin-bottom: 14px; }
+  h1.title { font-size: 27px; }
+  .col3 { grid-template-columns: 1fr; }
+  .stage-card { order: -2; }
+  .col1 > .card, .col2 > .card { order: 1; }
+}
+</style>
+</head>
+<body data-page-node-id="Fc7SSQssTTOCR7FkiyvvBk">
+
+<div class="app" data-page-node-id="89PyoAmAEmAxgfzDuilQVI">
+  <header class="hero" data-page-node-id="ipsPPl7ADUOeK3jobblwbg">
+    <div data-page-node-id="VuBoZIv4XRu7BLAJN3xteH">
+      <h1 class="title" data-page-node-id="TZ6uurDai38DGKa0mVrSyC"><span class="em" data-page-node-id="5Qc5yuB5OlkI8XbScwhvHs">🍜</span> 今天吃啥 · 命运转盘</h1>
+      <div class="subtitle" data-page-node-id="Ky7hlEVVtG4uWi6EoOX2tz">专治 <b data-page-node-id="87m1g9dUL6Mn989Z4K5MUj">选择困难症</b> · 选个口味，剩下的交给宇宙 · 由 <b data-page-node-id="waqThfC5hLfRVG3inxQeES">屎山代码</b> 强力驱动（能跑，别动）</div>
+    </div>
+    <div class="hero-right" data-page-node-id="Y5CNsjeI9uaG8vh9m3a5zA">
+      <span style="font-size:12px;color:#b08d75" data-page-node-id="m9syoP8JmmLPKTKP1XFofN">v9.9.9-final-真的最终版</span>
+    </div>
+  </header>
+
+  <div class="main" data-page-node-id="8wOee5TGmm3bFYDGrqgiCW">
+    <!-- ======================= 左栏 ======================= -->
+    <div class="col1" data-page-node-id="VtG87T9btoC4MZUyuOiDgr">
+      <section class="card" data-page-node-id="agHBizjNoL6CrRx11rI7VH">
+        <h2 data-page-node-id="dyMaClHlYdyEVffYTzUw4a"><span class="idx" data-page-node-id="Wv58Or9628FfJIzojwa005">01</span><span class="dot" data-page-node-id="kBFADeIdab6cAJe5CGzNZW"></span>今天想吃什么口味？</h2>
+        <div class="hint" data-page-node-id="iwLXYzeAT3hOWTcLcEJwGM">可多选，不选就是「随便」——随便也是一种选择。</div>
+        <div class="chips" id="chips" data-page-node-id="hjUFWWyBEVY5beDpQwCcp4"></div>
+        <div class="row-mini" data-page-node-id="avg13LgVNkoDsMOGdjmJuv">
+          <button class="btn-ghost" id="btnAll" data-page-node-id="NxTfe30ibzjBJLpvQkGEOm">🎯 全都要</button>
+          <button class="btn-ghost" id="btnRandom" data-page-node-id="z8irL1uf5ER1BDx2cp2vua">🎲 随机一种</button>
+          <button class="btn-ghost" id="btnClear" data-page-node-id="VuQWIg0CGm7BrQpi66MWVf">🧹 清空</button>
+        </div>
+      </section>
+
+      <section class="card col2" data-page-node-id="ZWbgvyZVBuR9tTId754uCE">
+        <h2 data-page-node-id="9vcH9U44qjMmYY0wAcjX6W"><span class="idx" data-page-node-id="KP3KmaZMokPWOep9RmOjlR">02</span><span class="dot" data-page-node-id="TEc710tk3EZkK4FfBnFBtM"></span>还想吃点别的？</h2>
+        <div class="hint" data-page-node-id="uEvJxDp3H2van5S6BECc4A">把私藏加进转盘，它会一直存在你的盘里。</div>
+        <div class="input-row" data-page-node-id="RMf7g65u2LCw0Gknk3sycg">
+          <input id="customInput" maxlength="12" placeholder="例如：妈妈做的番茄面" data-page-node-id="DZ6C7ZqUG7WTbksxs81DA8">
+          <button class="btn-add" id="btnCustom" data-page-node-id="aANypEfdulLuzoxuCDS3X2">加入</button>
+        </div>
+        <div id="customList" data-page-node-id="mcbIIRwooRdec5EDLlLBhY"></div>
+      </section>
+
+      <section class="card col2" data-page-node-id="AZtIXP2SQlbZWAbpdJeJcp">
+        <h2 data-page-node-id="tUkVqt8ygxGyFWUUTiAQqN"><span class="idx" data-page-node-id="UEMjAaDPNKCVUPxaO6kbhu">03</span><span class="dot" data-page-node-id="zPvZ8JguZMRgBQ1EVlfDUQ"></span>附加选项</h2>
+        <label class="switch" data-page-node-id="ZwNW0QMCAqZLE8wsNbdkjy"><span data-page-node-id="jVEIMIfRFK5f6BO1NnwEOg">🙈 避开最近 3 次吃过的</span><span class="sw" data-page-node-id="HxHx9qRvxxMt8JRCe30Wzt"><input type="checkbox" id="optAvoid" checked data-page-node-id="cbIUaw284uuV3AaAvrhA1p"><i data-page-node-id="eoVBFjne3wbBhaO1UMZzvl"></i></span></label>
+        <label class="switch" data-page-node-id="ToYRBmdGuSe0UVlD0OmDfN"><span data-page-node-id="6Ew0qXs7HgJDTjN9XRN2mo">🔊 音效（转盘咔哒声）</span><span class="sw" data-page-node-id="MAuLb7Z1i9CaoxaCczh91F"><input type="checkbox" id="optSound" checked data-page-node-id="wWuzL1Xm2UAbrny63NPd3X"><i data-page-node-id="7u43Rap6YghPfdYKHLLZNt"></i></span></label>
+        <label class="switch" data-page-node-id="HJD8O07YI8H8pVnmN79KfU"><span data-page-node-id="5o5kExd1Ue5s56qJT0AzUD">🎉 撒花效果</span><span class="sw" data-page-node-id="FuDrSoBUjoxalcHXVuyB38"><input type="checkbox" id="optConfetti" checked data-page-node-id="25pJ2wfH0uVYPKLIXvQ5Hy"><i data-page-node-id="GukA23hmwFsll87uPe4qp4"></i></span></label>
+        <label class="switch" data-page-node-id="uO0AkvhPCYS0yavxtKG11f"><span data-page-node-id="Zy7EUpkUQj9xmwBiEd4GuI">🔒 选中后锁定转盘</span><span class="sw" data-page-node-id="p13nUnKiMHn38iBQZPsUgm"><input type="checkbox" id="optLock" data-page-node-id="UbvdvzFn2LslYI60PXVs8Z"><i data-page-node-id="AZ9Bwoi4j0kBI1dJ8ON9AC"></i></span></label>
+      </section>
+    </div>
+
+    <!-- ======================= 中栏 ======================= -->
+    <div class="col3" data-page-node-id="fXx0sUrcVrDQ00uXottrjT">
+      <section class="card stage-card" data-page-node-id="xan6JCBDz4KJvyuh7nYVHH">
+        <div class="stage" data-page-node-id="huOe2TQgAkAxibyFpC9dDw">
+          <div class="pointer" data-page-node-id="yarxoUcs4Bm8WiTe2rlnKl">
+            <svg viewBox="0 0 40 56" xmlns="http://www.w3.org/2000/svg" data-page-node-id="I4IuxhTDjTWgD9HZ1o4bX9">
+              <defs data-page-node-id="hJFN7OOXelfnqS8Xm03vdu">
+                <linearGradient id="pg" x1="0" y1="0" x2="0" y2="1" data-page-node-id="iC3tuVzDFHNjtPHatWVBky">
+                  <stop offset="0%" stop-color="#ffd67a" data-page-node-id="45kXbeY8S5ez73fuZN2Q9L"/><stop offset="45%" stop-color="#ff7a3d" data-page-node-id="uRkJ4Gsf3jB1RJj6aJn4ZE"/><stop offset="100%" stop-color="#e8262d" data-page-node-id="spxzffeyHtz6cKMtGRi7ll"/>
+                </linearGradient>
+              </defs>
+              <path d="M20 54 L4.5 21 A 16.5 16.5 0 1 1 35.5 21 Z" fill="url(#pg)" stroke="#fff" stroke-width="3.4" stroke-linejoin="round" data-page-node-id="obZTuQwihF1QcQYzQS4qD0"/>
+              <circle cx="20" cy="17" r="4.6" fill="#fff" opacity=".92" data-page-node-id="zSE1MA3yLqU4IjMzRHVHBz"/>
+            </svg>
+          </div>
+          <canvas id="wheel" data-page-node-id="mNTd6xHRNyXTEfPGzbHU76"></canvas>
+          <button class="hub" id="hub" data-page-node-id="o5Zq1yy5hrLaQ8QZAjYxKm"><span class="big" data-page-node-id="WUJkAvGX4sPnlCxYdQM2tD">开转</span><span class="small" data-page-node-id="haGzJyHZnDcDcC7CoVM4NU">GO</span></button>
+        </div>
+        <div class="stage-foot" data-page-node-id="JVhQPSFJ68pLRkFrj616Dm">
+          <span class="pill" data-page-node-id="E8jp6pP2K1HH1AFxGXx3W4">🎯 本轮候选 <b id="poolCount" data-page-node-id="5IHBOEKcOEWz8UAZpkLFpR">0</b> 道 ｜ 菜库共 <b id="dbCount" data-page-node-id="JYFPkReg3i2RgmeCaBMcPA">0</b> 道</span>
+        </div>
+      </section>
+    </div>
+
+    <!-- ======================= 右栏 ======================= -->
+    <div class="col3" data-page-node-id="FFmvM0V9kni40NU5Hyepio">
+      <section class="card" data-page-node-id="I9EckJgmJBiJkghUwLXZFx">
+        <h2 data-page-node-id="AVejgzia5kLykrJ4f6zRn3"><span class="idx" data-page-node-id="5wBnKhtvsbKxZRtUmzAJDf">04</span><span class="dot" data-page-node-id="tCwsyiSmp0yfAcAshiIjPg"></span>命运的决定</h2>
+        <div class="result empty" id="result" data-page-node-id="pxBs1XnzvlsUOILWcc4moY">
+          <div class="ph-emoji" data-page-node-id="feGVMUjqZSo43g1xCM8h18">🤔</div>
+          <div class="verdict" style="font-size:13px" data-page-node-id="5ywaMHQjJhICdWczyHrYfr">转盘还在等你动手</div>
+          <div class="verdict" style="font-size:11.5px;opacity:.8" data-page-node-id="eV41f5u3RZooss0eP7tngL">（点转盘中间那个红色的按钮）</div>
+        </div>
+      </section>
+
+      <section class="card" data-page-node-id="0IycmNhyhtSp4WBw8wGRZb">
+        <h2 data-page-node-id="yZRGB2N0sB0xRU3IOjVoAS"><span class="idx" data-page-node-id="DjHRIhxREQ7Iv3yPlHF8Ok">05</span><span class="dot" data-page-node-id="iSDlFK0oUKspPZsXdDqHaU"></span>今日已定</h2>
+        <div id="history" data-page-node-id="CTvFyYMKBynDCxBecWMJD5"></div>
+        <button class="btn-clear" id="btnClearHist" data-page-node-id="vYLYkjyksp3syVwsTgoVrw">清空记录（不推荐，历史是尊严）</button>
+      </section>
+    </div>
+  </div>
+</div>
+
+<canvas id="confetti" data-page-node-id="TGMfRmugwOhS23933RXIpj"></canvas>
+<div id="toast" data-page-node-id="fUABJPmnAjnwh1gTF8fPeD"></div>
+
+<script>
+/* ==========================================================================
+   ⛰️ 第 2 层屎山：JavaScript
+   阅读指南：不要试图理解全局，只要相信它。它跑了 300 多天没出过事。
+   （出过一次，是 2025 年 3 月，原因见第 412 行注释）
+   ========================================================================== */
+
+// 全局变量一律用 var，这是祖传规矩
+var a1 = 0, b2 = 0, _tmp = null, tmpVar2 = undefined, zzz;
+var dx = 0, dy = 0, dx2 = 0;                 // dx2 从来没用过，但删了会报错（其实不会）
+var 菜品库 = [];                              // 中文变量名，谁反对谁重构
+var 池子 = [], 当前结果 = null, 转动中 = false;
+var lock = false, lock2 = false, lock999 = false;   // 三重保险，实际上只用 lock
+var god = { R: 0, C: 0, seg: 0, rot: 0 };    // god 就是核心，别问
+var lastIdx = -1, tickCount = 0;
+var HUGE_NUMBER_不要动 = 99999;
+var THE_ANSWER = 42;   // 没有用到，但是删了良心不安
+
+/* ---------- 菜品源数据 ----------
+   emoji 是图形提醒，t 是口味标签：[酸 甜 辣 咸]
+   加菜请加在末尾，不要插在中间，否则……其实也没什么，但别插中间。 */
+var FOODS_源数据 = [
+  { n: "酸菜鱼",        e: "🐟", t: ["酸","辣"] },
+  { n: "酸辣粉",        e: "🍜", t: ["酸","辣"] },
+  { n: "番茄炒蛋",      e: "🍅", t: ["酸","甜"] },
+  { n: "酸汤肥牛",      e: "🥘", t: ["酸","辣"] },
+  { n: "柠檬鸡爪",      e: "🍋", t: ["酸","辣"] },
+  { n: "糖醋排骨",      e: "🍖", t: ["酸","甜"] },
+  { n: "醋溜土豆丝",    e: "🥔", t: ["酸"] },
+  { n: "冰糖葫芦",      e: "🍡", t: ["酸","甜"] },
+  { n: "番茄牛腩",      e: "🍲", t: ["酸","甜","咸"] },
+  { n: "泡菜煎饼",      e: "🥬", t: ["酸","辣"] },
+  { n: "泰式柠檬虾",    e: "🍤", t: ["酸","辣"] },
+  { n: "韩式泡菜汤",    e: "🍲", t: ["酸","辣"] },
+  { n: "杨枝甘露",      e: "🥭", t: ["酸","甜"] },
+  { n: "番茄肉酱意面",  e: "🍝", t: ["酸","甜","咸"] },
+
+  { n: "提拉米苏",      e: "🍰", t: ["甜"] },
+  { n: "芋圆烧仙草",    e: "🍧", t: ["甜"] },
+  { n: "拔丝地瓜",      e: "🍠", t: ["甜"] },
+  { n: "珍珠奶茶",      e: "🧋", t: ["甜"] },
+  { n: "港式蛋挞",      e: "🥧", t: ["甜"] },
+  { n: "蜜汁叉烧",      e: "🍯", t: ["甜","咸"] },
+  { n: "银耳莲子羹",    e: "🍵", t: ["甜"] },
+  { n: "舒芙蕾松饼",    e: "🥞", t: ["甜"] },
+  { n: "巧克力熔岩蛋糕",e: "🍫", t: ["甜"] },
+  { n: "芒果班戟",      e: "🥭", t: ["甜"] },
+  { n: "桂花酒酿圆子",  e: "🍡", t: ["甜"] },
+  { n: "奥利奥奶昔",    e: "🥤", t: ["甜"] },
+  { n: "芝士焗红薯",    e: "🍠", t: ["甜","咸"] },
+  { n: "咸蛋黄焗南瓜",  e: "🎃", t: ["甜","咸"] },
+  { n: "冰淇淋圣代",    e: "🍨", t: ["甜"] },
+  { n: "泰式芒果糯米饭",e: "🥭", t: ["甜"] },
+
+  { n: "麻辣火锅",      e: "🍲", t: ["辣"] },
+  { n: "麻辣香锅",      e: "🥘", t: ["辣"] },
+  { n: "麻辣烫",        e: "🍢", t: ["辣"] },
+  { n: "重庆小面",      e: "🍜", t: ["辣"] },
+  { n: "水煮牛肉",      e: "🥩", t: ["辣"] },
+  { n: "剁椒鱼头",      e: "🐠", t: ["辣"] },
+  { n: "麻辣小龙虾",    e: "🦞", t: ["辣"] },
+  { n: "干锅牛蛙",      e: "🐸", t: ["辣"] },
+  { n: "串串香",        e: "🍢", t: ["辣"] },
+  { n: "新疆炒米粉",    e: "🍝", t: ["辣"] },
+  { n: "辣椒炒肉",      e: "🌶️", t: ["辣","咸"] },
+  { n: "螺蛳粉",        e: "🍜", t: ["酸","辣"] },
+  { n: "麻辣鸡公煲",    e: "🍲", t: ["辣","咸"] },
+  { n: "川味回锅肉",    e: "🥓", t: ["辣","咸"] },
+  { n: "韩式部队锅",    e: "🍲", t: ["辣","咸"] },
+  { n: "咖喱鸡饭",      e: "🍛", t: ["辣","咸"] },
+
+  { n: "卤味拼盘",      e: "🍗", t: ["咸"] },
+  { n: "烧烤串",        e: "🍢", t: ["咸"] },
+  { n: "盐水鸭",        e: "🦆", t: ["咸"] },
+  { n: "猪肉白菜饺子",  e: "🥟", t: ["咸"] },
+  { n: "兰州拉面",      e: "🍜", t: ["咸"] },
+  { n: "小笼包",        e: "🥟", t: ["咸"] },
+  { n: "生煎包",        e: "🥟", t: ["咸"] },
+  { n: "芝士汉堡",      e: "🍔", t: ["咸"] },
+  { n: "炸鸡桶",        e: "🍗", t: ["咸"] },
+  { n: "玛格丽特披萨",  e: "🍕", t: ["咸"] },
+  { n: "三文鱼寿司",    e: "🍣", t: ["咸"] },
+  { n: "潮汕牛肉丸",    e: "🍡", t: ["咸"] },
+  { n: "皮蛋瘦肉粥",    e: "🥣", t: ["咸"] },
+  { n: "广式肠粉",      e: "🍥", t: ["咸"] },
+  { n: "日式咖喱猪排",  e: "🍛", t: ["咸"] },
+  { n: "沙拉碗",        e: "🥗", t: ["酸","咸"] }
+];
+菜品库 = FOODS_源数据.slice(0);   // 复制一份，虽然没人改过原来的
+
+/* ---------- 调色盘 ---------- */
+var COLORS = ["#FF6B6B","#FFC93C","#5FD068","#4D96FF","#FF9F45","#B07CF7",
+              "#F76C9D","#2FC4B2","#FF8A5B","#7FB2FF","#FFB26B","#6BD6A0"];
+var 口味表 = [
+  { k: "酸", e: "🍋" },
+  { k: "甜", e: "🍬" },
+  { k: "辣", e: "🌶️" },
+  { k: "咸", e: "🧂" }
+];
+var 选中口味 = [];
+
+/* ---------- 一些工具函数（有重复，因为第二个人不敢删第一个人的） ---------- */
+function rnd(n) { return Math.floor(Math.random() * n); }
+function rnd2(n) { return Math.floor(Math.random() * n); }      // 和 rnd 一模一样
+function rnd3(min, max) { return min + Math.random() * (max - min); }
+function shuffle(arr) {
+  var t = arr.slice(0);
+  for (var i = t.length - 1; i > 0; i--) {
+    var j = rnd(i + 1);
+    var k = t[i]; t[i] = t[j]; t[j] = k;
+  }
+  return t;
+}
+function 洗牌(x) { return shuffle(x); }   // 别名，满足不同人的口味
+function norm(a) { var P = Math.PI * 2; return ((a % P) + P) % P; }
+function $(id) { return document.getElementById(id); }
+function esc(s) {
+  return String(s).replace(/[&<>"']/g, function (m) {
+    return ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[m];
+  });
+}
+
+/* ---------- 命运台词（其实只是安慰剂） ---------- */
+var 台词 = [
+  "宇宙已替你决定，不要反驳。",
+  "别再刷外卖了，就是这个。",
+  "肠胃表示：同意。",
+  "选择困难症，今日痊愈。",
+  "这是转盘的旨意，不是我的。",
+  "再转一次就是不相信科学。",
+  "已记入史册（右下角那个列表）。",
+  "命里有时终须有，命里无时转一转。"
+];
+
+/* ---------- 屎山经典：一个被注释掉的旧版本，谁也不敢删 ----------
+function oldSpin_2019(idx) {
+  var rot = 0;
+  setInterval(function () {
+    rot += 0.3;                       // TODO: 换成缓动（2019 年的 TODO）
+    paint(rot);
+    if (rot > 100) { clearInterval(this); }
+  }, 16);
+}
+------------------------------------------------------------------ */
+
+/* ==========================================================================
+   转盘绘制
+   ========================================================================== */
+var cv = $("wheel");
+var ctx = cv.getContext("2d");
+var confCv = $("confetti");
+var cctx = confCv.getContext("2d");
+var parts = [];   // 撒花粒子
+
+function fitCanvas() {
+  var dpr = window.devicePixelRatio || 1;
+  var rect = cv.getBoundingClientRect();
+  var w = Math.max(240, Math.round(rect.width));
+  cv.width = Math.round(w * dpr);
+  cv.height = Math.round(w * dpr);
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  god.size = w;
+
+  confCv.width = Math.round(window.innerWidth * dpr);
+  confCv.height = Math.round(window.innerHeight * dpr);
+  cctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+
+function paint(rot) {
+  var S = god.size || 500;
+  var cx = S / 2, cy = S / 2;
+  var R = S / 2 - 12;
+  ctx.clearRect(0, 0, S, S);
+
+  // 底盘阴影
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(cx, cy, R + 4, 0, Math.PI * 2);
+  ctx.fillStyle = "rgba(180,110,50,.16)";
+  ctx.filter = "blur(6px)";
+  ctx.fill();
+  ctx.restore();
+
+  var n = 池子.length;
+  if (n === 0) {
+    ctx.beginPath();
+    ctx.arc(cx, cy, R, 0, Math.PI * 2);
+    ctx.fillStyle = "#fff3e2";
+    ctx.fill();
+    ctx.fillStyle = "#c09a7a";
+    ctx.font = "600 18px " + FONT;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText("没有匹配的菜，换个口味试试", cx, cy - 40);
+    return;
+  }
+
+  var seg = (Math.PI * 2) / n;
+  god.seg = seg;
+
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.rotate(rot);
+
+  for (var i = 0; i < n; i++) {
+    var s = i * seg, e2 = s + seg;
+    var item = 池子[i];
+
+    // 扇形
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.arc(0, 0, R - 9, s, e2);
+    ctx.closePath();
+    var base = item.c || COLORS[i % COLORS.length];
+    ctx.fillStyle = base;
+    ctx.fill();
+
+    // 内侧暗角，制造立体感（这行是抄的，但效果是真的好）
+    var g = ctx.createRadialGradient(0, 0, R * 0.18, 0, 0, R);
+    g.addColorStop(0, "rgba(255,255,255,.30)");
+    g.addColorStop(.62, "rgba(255,255,255,0)");
+    g.addColorStop(1, "rgba(80,30,0,.20)");
+    ctx.fillStyle = g;
+    ctx.fill();
+
+    // 分割线
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.lineTo(Math.cos(s) * (R - 9), Math.sin(s) * (R - 9));
+    ctx.strokeStyle = "rgba(255,255,255,.72)";
+    ctx.lineWidth = 1.6;
+    ctx.stroke();
+  }
+
+  // 文字与 emoji
+  ctx.textBaseline = "middle";
+  for (var j = 0; j < n; j++) {
+    var it = 池子[j];
+    var mid = (j + 0.5) * seg;
+    var name = it.n;
+
+    // emoji：保持正立，画在靠内的位置
+    ctx.save();
+    ctx.font = "26px " + EMOJI_FONT;
+    ctx.textAlign = "center";
+    ctx.fillText(it.e || "🍽️", Math.cos(mid) * (R * 0.60), Math.sin(mid) * (R * 0.60));
+    ctx.restore();
+
+    // 菜名：沿半径方向排布
+    ctx.save();
+    ctx.rotate(mid);
+    ctx.font = "800 " + Math.max(12, Math.min(17, R * 0.045)) + "px " + FONT;
+    ctx.lineJoin = "round";
+    if (Math.cos(mid) < 0) {
+      ctx.translate(R - 24, 0);
+      ctx.rotate(Math.PI);
+      ctx.textAlign = "left";
+    } else {
+      ctx.textAlign = "right";
+    }
+    var tx = Math.cos(mid) < 0 ? 0 : R - 24;
+    var ty = 0;
+    // 白色描边让文字在深色扇形上也清楚
+    ctx.lineWidth = 4;
+    ctx.strokeStyle = "rgba(255,255,255,.86)";
+    ctx.strokeText(name, tx, ty);
+    ctx.fillStyle = "#3a2113";
+    ctx.fillText(name, tx, ty);
+    ctx.restore();
+  }
+
+  ctx.restore();
+
+  // 外圈金边
+  var ring = ctx.createLinearGradient(cx - R, cy - R, cx + R, cy + R);
+  ring.addColorStop(0, "#ffe9b8");
+  ring.addColorStop(.35, "#f2b56a");
+  ring.addColorStop(.6, "#ffe3ad");
+  ring.addColorStop(1, "#d9954c");
+  ctx.beginPath();
+  ctx.arc(cx, cy, R - 1, 0, Math.PI * 2);
+  ctx.lineWidth = 15;
+  ctx.strokeStyle = ring;
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.arc(cx, cy, R - 8, 0, Math.PI * 2);
+  ctx.lineWidth = 2;
+  ctx.strokeStyle = "rgba(255,255,255,.85)";
+  ctx.stroke();
+
+  // 灯泡：转得越快闪得越欢（其实是按角度闪的，假装很聪明）
+  var bulbs = 24;
+  for (var k = 0; k < bulbs; k++) {
+    var ang = (Math.PI * 2 / bulbs) * k + rot * 0.35;
+    var bx = cx + Math.cos(ang) * (R - 1);
+    var by = cy + Math.sin(ang) * (R - 1);
+    var on = (Math.floor(rot * 6) + k) % 2 === 0;
+    ctx.beginPath();
+    ctx.arc(bx, by, 4.1, 0, Math.PI * 2);
+    ctx.fillStyle = on ? "#fffdf3" : "#c98f45";
+    ctx.shadowColor = "rgba(255,230,170,.95)";
+    ctx.shadowBlur = on ? 9 : 0;
+    ctx.fill();
+    ctx.shadowBlur = 0;
+  }
+
+  // 中心白圈打底（按钮盖在上面）
+  ctx.beginPath();
+  ctx.arc(cx, cy, R * 0.135, 0, Math.PI * 2);
+  ctx.fillStyle = "rgba(255,255,255,.96)";
+  ctx.fill();
+}
+var FONT = '"PingFang SC","Microsoft YaHei","Segoe UI",system-ui,sans-serif';
+var EMOJI_FONT = '"Segoe UI Emoji","Apple Color Emoji","Noto Color Emoji",sans-serif';
+
+/* ==========================================================================
+   池子（候选菜）逻辑
+   ========================================================================== */
+function 建造池子() {
+  var out = [];
+  var 自定义 = 读取自定义();
+
+  // 1) 自定义菜永远在场（用户亲手加的，不能亏待）
+  out = out.concat(自定义.map(function (c) {
+    return { n: c, e: "🍽️", t: ["自定义"], custom: true };
+  }));
+
+  // 2) 按口味筛
+  var base = 菜品库.slice(0);
+  if (选中口味.length > 0) {
+    var hit = base.filter(function (x) {
+      for (var i = 0; i < 选中口味.length; i++) {
+        if (x.t.indexOf(选中口味[i]) >= 0) return true;
+      }
+      return false;
+    });
+    // 如果筛得太狠（少于 6 道），就把同口味的兄弟也叫上
+    if (hit.length < 6) {
+      var 补 = base.filter(function (x) {
+        return 选中口味.some(function (k) { return (x.t || []).join("").indexOf(k) >= 0; });
+      });
+      hit = hit.concat(补);
+    }
+    base = hit;
+  }
+
+  // 3) 避开最近吃过的
+  if ($("optAvoid").checked) {
+    var recent = 读历史().slice(0, 3).map(function (h) { return h.n; });
+    if (recent.length > 0) {
+      var filtered = base.filter(function (x) { return recent.indexOf(x.n) < 0; });
+      if (filtered.length >= 6) base = filtered;      // 太少就不避了，饿不死比讲究重要
+    }
+  }
+
+  base = 洗牌(base);
+
+  // 4) 转盘最多 12 格，多了眼睛受不了
+  var maxSeg = 12;
+  if (base.length > maxSeg) base = base.slice(0, maxSeg);
+
+  out = out.concat(base);
+  if (out.length > maxSeg) {
+    // 自定义优先保留
+    var cus = out.filter(function (x) { return x.custom; });
+    var rest = out.filter(function (x) { return !x.custom; });
+    out = cus.slice(0, 2).concat(rest.slice(0, maxSeg - Math.min(2, cus.length)));
+  }
+  return out;
+}
+
+// 废弃函数，留着以防万一（已经留了两年了）
+function buildPool_old_way() {
+  return 菜品库.filter(function (x) { return 选中口味.length === 0 || x.t[0] === 选中口味[0]; });
+}
+
+function 刷新池子() {
+  池子 = 建造池子();
+  $("poolCount").textContent = 池子.length;
+  $("dbCount").textContent = 菜品库.length;
+  if (当前结果 === null) paint(god.rot || 0);
+  else paint(god.rot || 0);
+  if (池子.length === 0) {
+    toast("这个口味太苛刻了，一个菜都没剩下 🥲");
+  }
+}
+
+/* ==========================================================================
+   转动
+   ========================================================================== */
+function 开转(force) {
+  if (转动中) return;
+  if (lock && 当前结果) { toast("已锁定结果，先点「再转一次」解锁 🔒"); return; }
+  if (池子.length < 2) { toast("候选太少，转不起来，换个口味吧 😅"); return; }
+
+  当前结果 = null;
+  转动中 = true;
+  var hub = $("hub");
+  hub.disabled = true;
+  hub.classList.remove("pulse");
+  hub.querySelector(".big").textContent = "转动";
+  hub.querySelector(".small").textContent = "...";
+
+  // 先内定赢家，再倒推角度 —— 这样指针和结果永远不会打架
+  // （别问为什么不直接算，问就是 2025 年 3 月那次指针和结果对不上）
+  var winIdx = rnd2(池子.length);
+  var n = 池子.length;
+  var seg = Math.PI * 2 / n;
+  var twoPi = Math.PI * 2;
+  var start = god.rot || 0;
+  var mid = (winIdx + 0.5) * seg;
+
+  var base = -Math.PI / 2 - mid;                       // 让赢家中心对准顶部指针
+  var turns = 6 + rnd(3);                              // 6~8 圈，转得久才显得有诚意
+  var need = start + turns * twoPi;
+  var k = Math.ceil((need - base) / twoPi) + 1;        // +1 是为了保证圈数只多不少（少半圈会被看出来）
+  var jitter = (Math.random() - 0.5) * seg * 0.62;     // 别每次都正中，太假
+  var target = base + k * twoPi + jitter;
+
+  var dur = 4300 + rnd(900);
+  var t0 = performance.now();
+  lastIdx = -1;
+
+  function ease(t) { return 1 - Math.pow(1 - t, 4); }   // easeOutQuart，手感的全部秘密
+
+  function frame(now) {
+    var t = Math.min(1, (now - t0) / dur);
+    god.rot = start + (target - start) * ease(t);
+    paint(god.rot);
+
+    // 咔哒声 & 记录指针下的格子
+    var under = Math.floor(norm(-Math.PI / 2 - god.rot) / seg);
+    if (under !== lastIdx) {
+      lastIdx = under;
+      tickCount++;
+      if ($("optSound").checked) sfxTick(t);
+    }
+
+    if (t < 1) {
+      requestAnimationFrame(frame);
+    } else {
+      god.rot = target;
+      paint(god.rot);
+      转动中 = false;
+      hub.disabled = false;
+      hub.querySelector(".big").textContent = "开转";
+      hub.querySelector(".small").textContent = "GO";
+      hub.classList.add("pulse");
+      揭晓(winIdx);
+    }
+  }
+  requestAnimationFrame(frame);
+
+  if ($("optSound").checked) sfxWhoosh();
+}
+
+function 揭晓(idx) {
+  var item = 池子[idx];
+  if (!item) return;
+  当前结果 = item;
+
+  var box = $("result");
+  box.className = "result win";
+  box.innerHTML =
+    '<div class="emo">' + esc(item.e || "🍽️") + "</div>" +
+    '<div class="name">' + esc(item.n) + "</div>" +
+    '<div class="tags">' + (item.t || []).map(function (t) {
+      return '<span class="tag f-' + esc(t) + '">' + esc(t) + "</span>";
+    }).join("") + "</div>" +
+    '<div class="verdict">' + esc(台词[rnd(台词.length)]) + "</div>" +
+    '<div class="acts">' +
+      '<button class="btn-main" id="btnGo">就吃这个 ✅</button>' +
+      '<button class="btn-sub" id="btnAgain">再转一次 🔁</button>' +
+    "</div>";
+
+  $("btnGo").onclick = function () {
+    toast("已记入今日史册：" + 当前结果.n + " 🎉");
+    if ($("optConfetti").checked) burst(140);
+    if ($("optSound").checked) sfxWin();
+    if ($("optLock").checked) { lock = true; toast("已锁定 🔒 点「再转一次」可解锁"); }
+  };
+  $("btnAgain").onclick = function () {
+    lock = false;
+    当前结果 = null;
+    刷新池子();
+    开转(true);
+  };
+
+  写入历史(item);
+  if ($("optConfetti").checked) burst(120);
+  if ($("optSound").checked) sfxWin();
+}
+
+// 又被注释掉的第三版实现，留个纪念
+// function 揭晓_v3(idx) { alert("今天吃：" + 池子[idx].n); }
+
+/* ==========================================================================
+   音效（纯 WebAudio，不加载任何文件，省流量）
+   ========================================================================== */
+var AC = null;
+function actx() {
+  if (!AC) {
+    var C = window.AudioContext || window.webkitAudioContext;
+    if (!C) return null;
+    AC = new C();
+  }
+  if (AC.state === "suspended") AC.resume();
+  return AC;
+}
+function sfxTick(progress) {
+  var a = actx(); if (!a) return;
+  var o = a.createOscillator(), g = a.createGain();
+  o.type = "square";
+  o.frequency.value = 1350 - 320 * (progress || 0);
+  g.gain.value = 0.035;
+  o.connect(g); g.connect(a.destination);
+  var now = a.currentTime;
+  o.start(now);
+  g.gain.setValueAtTime(0.035, now);
+  g.gain.exponentialRampToValueAtTime(0.0008, now + 0.035);
+  o.stop(now + 0.045);
+}
+function sfxWhoosh() {
+  var a = actx(); if (!a) return;
+  var o = a.createOscillator(), g = a.createGain();
+  o.type = "triangle";
+  o.frequency.setValueAtTime(180, a.currentTime);
+  o.frequency.exponentialRampToValueAtTime(520, a.currentTime + 0.28);
+  g.gain.setValueAtTime(0.0, a.currentTime);
+  g.gain.linearRampToValueAtTime(0.05, a.currentTime + 0.06);
+  g.gain.exponentialRampToValueAtTime(0.001, a.currentTime + 0.32);
+  o.connect(g); g.connect(a.destination);
+  o.start(); o.stop(a.currentTime + 0.34);
+}
+function sfxWin() {
+  var a = actx(); if (!a) return;
+  var notes = [523, 659, 784, 1046, 1318];
+  for (var i = 0; i < notes.length; i++) {
+    (function (f, i) {
+      setTimeout(function () {
+        var aa = actx(); if (!aa) return;
+        var o = aa.createOscillator(), g = aa.createGain();
+        o.type = "sine";
+        o.frequency.value = f;
+        g.gain.value = 0.075;
+        o.connect(g); g.connect(aa.destination);
+        var t = aa.currentTime;
+        o.start(t);
+        g.gain.setValueAtTime(0.075, t);
+        g.gain.exponentialRampToValueAtTime(0.001, t + 0.22);
+        o.stop(t + 0.24);
+      }, 78 * i);
+    })(notes[i], i);
+  }
+}
+
+/* ==========================================================================
+   撒花
+   ========================================================================== */
+function burst(count) {
+  var W = window.innerWidth, H = window.innerHeight;
+  for (var i = 0; i < (count || 100); i++) {
+    parts.push({
+      x: W / 2 + (Math.random() - 0.5) * 160,
+      y: H * 0.42 + (Math.random() - 0.5) * 80,
+      vx: (Math.random() - 0.5) * 11,
+      vy: -6 - Math.random() * 9,
+      g: 0.28 + Math.random() * 0.12,
+      s: 5 + Math.random() * 7,
+      r: Math.random() * Math.PI,
+      vr: (Math.random() - 0.5) * 0.3,
+      c: COLORS[rnd(COLORS.length)],
+      life: 1
+    });
+  }
+  if (!rafOn) { rafOn = true; requestAnimationFrame(confLoop); }
+}
+var rafOn = false;
+function confLoop() {
+  cctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+  for (var i = parts.length - 1; i >= 0; i--) {
+    var p = parts[i];
+    p.vy += p.g; p.x += p.vx; p.y += p.vy; p.r += p.vr; p.vx *= 0.994;
+    if (p.y > window.innerHeight + 40) { parts.splice(i, 1); continue; }
+    cctx.save();
+    cctx.translate(p.x, p.y);
+    cctx.rotate(p.r);
+    cctx.fillStyle = p.c;
+    cctx.fillRect(-p.s / 2, -p.s / 4, p.s, p.s / 2);
+    cctx.restore();
+  }
+  if (parts.length > 0) requestAnimationFrame(confLoop);
+  else { rafOn = false; cctx.clearRect(0, 0, window.innerWidth, window.innerHeight); }
+}
+
+/* ==========================================================================
+   历史记录（localStorage，命名极其随意）
+   ========================================================================== */
+var LS_KEY = "shishan_food_history_v1";
+var LS_CUS = "shishan_food_custom_v1";
+
+function 读历史() {
+  try {
+    var raw = localStorage.getItem(LS_KEY);
+    if (!raw) return [];
+    var arr = JSON.parse(raw);
+    return Array.isArray(arr) ? arr : [];
+  } catch (e) { return []; }
+}
+function 写历史(arr) {
+  try { localStorage.setItem(LS_KEY, JSON.stringify(arr.slice(0, 60))); } catch (e) {}
+}
+function 写入历史(item) {
+  var arr = 读历史();
+  arr.unshift({ n: item.n, e: item.e || "🍽️", ts: Date.now() });
+  写历史(arr);
+  刷新历史();
+}
+function 读取自定义() {
+  try {
+    var raw = localStorage.getItem(LS_CUS);
+    if (!raw) return [];
+    var arr = JSON.parse(raw);
+    return Array.isArray(arr) ? arr : [];
+  } catch (e) { return []; }
+}
+function 保存自定义(arr) {
+  try { localStorage.setItem(LS_CUS, JSON.stringify(arr.slice(0, 30))); } catch (e) {}
+}
+
+function 刷新历史() {
+  var box = $("history");
+  var arr = 读历史();
+  if (arr.length === 0) {
+    box.innerHTML = '<div class="none-tip">还没有记录哦～<br>转一次，命运就开始留痕了。</div>';
+    return;
+  }
+  var today = new Date().toDateString();
+  var html = "";
+  for (var i = 0; i < Math.min(arr.length, 20); i++) {
+    var h = arr[i];
+    var d = new Date(h.ts);
+    var isToday = d.toDateString() === today;
+    var hh = ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2);
+    html += '<div class="hist' + (isToday ? " today" : "") + '">' +
+              '<span class="he">' + esc(h.e || "🍽️") + "</span>" +
+              '<span class="hn">' + esc(h.n) + "</span>" +
+              '<span class="ht">' + (isToday ? hh : (d.getMonth() + 1) + "/" + d.getDate() + " " + hh) + "</span>" +
+            "</div>";
+  }
+  box.innerHTML = html;
+}
+
+function 刷新自定义列表() {
+  var arr = 读取自定义();
+  var box = $("customList");
+  if (arr.length === 0) { box.innerHTML = ""; return; }
+  box.innerHTML = arr.map(function (n, i) {
+    return '<span class="cus">🍽️ ' + esc(n) + ' <b data-i="' + i + '" title="移除">×</b></span>';
+  }).join("");
+  Array.prototype.forEach.call(box.querySelectorAll("b"), function (el) {
+    el.onclick = function () {
+      var i = parseInt(el.getAttribute("data-i"), 10);
+      var a = 读取自定义();
+      a.splice(i, 1);
+      保存自定义(a);
+      刷新自定义列表();
+      刷新池子();
+      toast("已从转盘移除 🗑️");
+    };
+  });
+}
+
+/* ==========================================================================
+   UI 绑定
+   ========================================================================== */
+function 建口味按钮() {
+  var box = $("chips");
+  box.innerHTML = "";
+  口味表.forEach(function (o) {
+    var b = document.createElement("button");
+    b.className = "chip";
+    b.setAttribute("data-k", o.k);
+    b.innerHTML = '<span class="k">' + o.e + "</span>" + o.k;
+    b.onclick = function () {
+      切换口味(o.k, b);
+    };
+    box.appendChild(b);
+  });
+}
+function 切换口味(k, el) {
+  var i = 选中口味.indexOf(k);
+  if (i >= 0) { 选中口味.splice(i, 1); el.setAttribute("data-on", "0"); }
+  else { 选中口味.push(k); el.setAttribute("data-on", "1"); }
+  刷新池子();
+  if ($("optSound").checked) sfxTick(0.9);   // 复用咔哒声，懒得很合理
+}
+
+function toast(msg) {
+  var t = $("toast");
+  t.textContent = msg;
+  t.classList.add("on");
+  clearTimeout(zzz);
+  zzz = setTimeout(function () { t.classList.remove("on"); }, 2200);
+}
+
+setTimeout(function () {
+  // 等等，先别急着绑定，等 DOM 都到齐（其实已经到齐了，习惯了）
+  建口味按钮();
+  刷新自定义列表();
+  刷新历史();
+  刷新池子();
+  fitCanvas();
+  paint(0);
+  setTimeout(function () {
+    paint(0);           // 再来一次，防止某些浏览器首次测量为 0（真的遇到过）
+  }, 60);
+  $("hub").classList.add("pulse");
+}, 0);
+
+$("hub").onclick = function () { 开转(false); };
+$("btnAll").onclick = function () {
+  选中口味 = ["酸","甜","辣","咸"];
+  Array.prototype.forEach.call(document.querySelectorAll(".chip"), function (c) { c.setAttribute("data-on", "1"); });
+  刷新池子();
+  toast("好的，全都要（胃：你冷静点）");
+};
+$("btnRandom").onclick = function () {
+  var k = 口味表[rnd(口味表.length)].k;
+  选中口味 = [k];
+  Array.prototype.forEach.call(document.querySelectorAll(".chip"), function (c) {
+    c.setAttribute("data-on", c.getAttribute("data-k") === k ? "1" : "0");
+  });
+  刷新池子();
+  toast("今天想吃「" + k + "」的，安排 🎲");
+};
+$("btnClear").onclick = function () {
+  选中口味 = [];
+  Array.prototype.forEach.call(document.querySelectorAll(".chip"), function (c) { c.setAttribute("data-on", "0"); });
+  刷新池子();
+  toast("随便也行，那就不挑了 🙂");
+};
+$("btnCustom").onclick = function () {
+  var v = $("customInput").value.trim();
+  if (!v) { toast("先写个菜名吧 😋"); return; }
+  var arr = 读取自定义();
+  if (arr.indexOf(v) >= 0) { toast("这个已经在盘里了"); return; }
+  if (菜品库.some(function (x) { return x.n === v; })) { toast("菜库里已经有它了，不用重复加"); }
+  arr.push(v);
+  保存自定义(arr);
+  $("customInput").value = "";
+  刷新自定义列表();
+  刷新池子();
+  toast("已加入转盘：「" + v + "」✨");
+};
+$("customInput").addEventListener("keydown", function (e) {
+  if (e.key === "Enter") $("btnCustom").click();
+});
+$("optSound").addEventListener("change", function () {
+  if (this.checked) { sfxTick(0.5); toast("音效已开 🔊"); } else toast("音效已关 🔇");
+});
+$("optConfetti").addEventListener("change", function () {
+  toast(this.checked ? "撒花已开 🎉" : "撒花已关（安静模式）");
+});
+$("optAvoid").addEventListener("change", function () {
+  刷新池子();
+  toast(this.checked ? "会避开最近 3 次吃过的 🙈" : "不再避开了，随缘");
+});
+$("optLock").addEventListener("change", function () {
+  if (!this.checked) lock = false;
+  toast(this.checked ? "选中后会锁定转盘 🔒" : "锁定已解除 🔓");
+});
+$("btnClearHist").onclick = function () {
+  if (!confirm("确定清空所有历史记录吗？（那些都是你做过的决定）")) return;
+  写历史([]);
+  刷新历史();
+  toast("历史已清空，从今天重新开始");
+};
+
+window.addEventListener("resize", function () {
+  fitCanvas();
+  paint(god.rot || 0);
+});
+document.addEventListener("keydown", function (e) {
+  if (e.code === "Space" || e.key === " ") {
+    e.preventDefault();
+    if (!转动中) 开转(false);
+  }
+});
+
+// 下面这两个函数从来没被调用过，但它们是 2020 年的遗产，动它们会遭天谴
+// function legacyInit() { document.body.style.opacity = 1; }
+// function legacyFix()  { setTimeout(function(){ legacyInit(); }, 100); }
+</script>
+</body>
+</html>
